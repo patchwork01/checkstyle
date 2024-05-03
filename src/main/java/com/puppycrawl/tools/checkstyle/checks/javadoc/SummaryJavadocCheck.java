@@ -599,7 +599,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
         final List<String> sentenceParts = new ArrayList<>();
         String sentence = null;
         for (String text : (Iterable<String>) () -> streamTextParts(ast).iterator()) {
-            String sentenceEnding = findSentenceEnding(text, period).orElse(null);
+            final String sentenceEnding = findSentenceEnding(text, period).orElse(null);
             if (sentenceEnding != null) {
                 sentenceParts.add(sentenceEnding);
                 sentence = String.join("", sentenceParts);
