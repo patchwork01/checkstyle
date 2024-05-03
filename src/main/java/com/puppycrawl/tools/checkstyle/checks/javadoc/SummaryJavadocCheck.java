@@ -647,7 +647,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             if (!DEFAULT_PERIOD.equals(period)
                 || afterPeriodIndex >= text.length()
                 || Character.isWhitespace(text.charAt(afterPeriodIndex))) {
-                    sentenceEnding = text.substring(0, periodIndex);
+                sentenceEnding = text.substring(0, periodIndex);
                 break;
             }
             else {
