@@ -232,11 +232,11 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC_MISSING);
         }
         else if (!period.isEmpty()) {
-            final String firstSentence = getFirstSentence(ast, period);
+            final Optional<String> firstSentence = getFirstSentence(ast, period);
             if (!summaryDoc.contains(period) || firstSentence.isEmpty()) {
                 log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
             }
-            else if (containsForbiddenFragment(firstSentence)) {
+            else if (containsForbiddenFragment(firstSentence.get())) {
                 log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
             }
         }
@@ -592,13 +592,13 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      *
      * @param ast Javadoc root node.
      * @param period The configured period symbol.
-     * @return The first sentence.
+     * @return The first sentence up to and excluding the period, if a sentence ending was found.
      */
-    private static String getFirstSentence(DetailNode ast, String period) {
+    private static Optional<String> getFirstSentence(DetailNode ast, String period) {
         final Deque<DetailNode> nodesToProcess = new LinkedList<>();
         nodesToProcess.push(ast);
         final List<String> sentenceParts = new ArrayList<>();
-        String sentence = "";
+        String sentence = null;
         while (!nodesToProcess.isEmpty()) {
             final DetailNode node = nodesToProcess.pop();
             if (node.getChildren().length == 0) {
@@ -617,7 +617,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
                 nodesToProcess.push(node.getChildren()[childIndex]);
             }
         }
-        return sentence;
+        return Optional.ofNullable(sentence);
     }
 
     /**
