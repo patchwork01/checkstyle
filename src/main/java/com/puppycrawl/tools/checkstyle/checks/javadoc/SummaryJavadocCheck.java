@@ -592,7 +592,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      *
      * @param ast Javadoc root node.
      * @param period The configured period symbol.
-     * @return first sentence.
+     * @return The first sentence.
      */
     private static String getFirstSentence(DetailNode ast, String period) {
         final Deque<DetailNode> nodesToProcess = new LinkedList<>();
@@ -625,9 +625,9 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * up to and excluding that period. The end of sentence detection here could be replaced in the
      * future by Java's built-in BreakIterator class.
      *
-     * @param text string to append to result
-     * @param period period character to find
-     * @return the string up to and excluding the period, if one was found
+     * @param text The string to search.
+     * @param period The period character to find.
+     * @return The string up to and excluding the period, if one was found.
      */
     private static Optional<String> findSentenceEnding(String text, String period) {
         int periodIndex = text.indexOf(period);
