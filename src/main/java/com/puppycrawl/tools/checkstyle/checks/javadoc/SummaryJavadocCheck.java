@@ -589,7 +589,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * Finds and returns first sentence.
      *
      * @param ast Javadoc root node.
-     * @param period Period character.
+     * @param period The configured period symbol.
      * @return first sentence.
      */
     private static String getFirstSentence(DetailNode ast, String period) {
