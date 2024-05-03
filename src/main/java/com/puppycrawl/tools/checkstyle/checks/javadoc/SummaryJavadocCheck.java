@@ -231,10 +231,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC_MISSING);
         }
         else if (!period.isEmpty()) {
-            if (!summaryDoc.contains(period)) {
-                log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
-            }
-            else {
+            if (summaryDoc.contains(period)) {
                 final String firstSentence = getFirstSentence(ast, period).orElse(null);
                 if (firstSentence == null) {
                     log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
@@ -242,6 +239,9 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
                 else if (containsForbiddenFragment(firstSentence)) {
                     log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
                 }
+            }
+            else {
+                log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
             }
         }
     }
