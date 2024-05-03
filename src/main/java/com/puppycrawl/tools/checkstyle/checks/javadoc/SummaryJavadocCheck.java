@@ -22,8 +22,6 @@ package com.puppycrawl.tools.checkstyle.checks.javadoc;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -604,7 +602,8 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
                 sentenceParts.add(sentenceEnding);
                 sentence = String.join("", sentenceParts);
                 break;
-            } else {
+            }
+            else {
                 sentenceParts.add(text);
             }
         }
@@ -618,13 +617,15 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @return All the text in all nodes that have no child nodes.
      */
     private static Stream<String> streamTextParts(DetailNode node) {
+        final Stream<String> stream;
         if (node.getChildren().length == 0) {
-            return Stream.of(node.getText());
+            stream = Stream.of(node.getText());
         }
         else {
-            return Stream.of(node.getChildren())
+            stream = Stream.of(node.getChildren())
                 .flatMap(child -> streamTextParts(child));
         }
+        return stream;
     }
 
     /**
