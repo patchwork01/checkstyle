@@ -600,9 +600,9 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
         nodesToProcess.push(ast);
         final List<String> sentenceParts = new ArrayList<>();
         String sentence = null;
-        for(String text : (Iterable<String>) () -> streamTextParts(ast).iterator()) {
+        for (String text : (Iterable<String>) () -> streamTextParts(ast).iterator()) {
             String sentenceEnding = findSentenceEnding(text, period).orElse(null);
-            if(sentenceEnding != null) {
+            if (sentenceEnding != null) {
                 sentenceParts.add(sentenceEnding);
                 sentence = String.join("", sentenceParts);
                 break;
@@ -620,9 +620,10 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @return All the text in all nodes that have no child nodes.
      */
     private static Stream<String> streamTextParts(DetailNode node) {
-        if(node.getChildren().length == 0) {
+        if (node.getChildren().length == 0) {
             return Stream.of(node.getText());
-        } else {
+        }
+        else {
             return Stream.of(node.getChildren())
                 .flatMap(child -> streamTextParts(child));
         }
