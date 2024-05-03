@@ -596,7 +596,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
     private static Optional<String> getFirstSentence(DetailNode ast, String period) {
         final List<String> sentenceParts = new ArrayList<>();
         String sentence = null;
-        for (String text : (Iterable<String>) () -> streamTextParts(ast).iterator()) {
+        for (String text : (Iterable<String>) streamTextParts(ast)::iterator) {
             final String sentenceEnding = findSentenceEnding(text, period).orElse(null);
             if (sentenceEnding != null) {
                 sentenceParts.add(sentenceEnding);
@@ -623,7 +623,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
         }
         else {
             stream = Stream.of(node.getChildren())
-                .flatMap(child -> streamTextParts(child));
+                .flatMap(SummaryJavadocCheck::streamTextParts);
         }
         return stream;
     }
