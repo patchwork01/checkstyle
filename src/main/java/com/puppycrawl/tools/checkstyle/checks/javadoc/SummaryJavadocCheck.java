@@ -231,12 +231,17 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC_MISSING);
         }
         else if (!period.isEmpty()) {
-            final String firstSentence = getFirstSentence(ast, period).orElse(null);
-            if (!summaryDoc.contains(period) || firstSentence == null) {
+            if (!summaryDoc.contains(period)) {
                 log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
             }
-            else if (containsForbiddenFragment(firstSentence)) {
-                log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
+            else {
+                final String firstSentence = getFirstSentence(ast, period).orElse(null);
+                if (firstSentence == null) {
+                    log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
+                }
+                else if(containsForbiddenFragment(firstSentence)) {
+                    log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
+                }
             }
         }
     }
