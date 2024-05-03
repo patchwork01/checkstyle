@@ -239,7 +239,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
                 if (firstSentence == null) {
                     log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
                 }
-                else if(containsForbiddenFragment(firstSentence)) {
+                else if (containsForbiddenFragment(firstSentence)) {
                     log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
                 }
             }
