@@ -596,8 +596,6 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @return The first sentence up to and excluding the period, if a sentence ending was found.
      */
     private static Optional<String> getFirstSentence(DetailNode ast, String period) {
-        final Deque<DetailNode> nodesToProcess = new LinkedList<>();
-        nodesToProcess.push(ast);
         final List<String> sentenceParts = new ArrayList<>();
         String sentence = null;
         for (String text : (Iterable<String>) () -> streamTextParts(ast).iterator()) {
