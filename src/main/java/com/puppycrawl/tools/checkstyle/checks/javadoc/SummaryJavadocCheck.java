@@ -236,7 +236,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             if (!summaryDoc.contains(period) || firstSentence.isEmpty()) {
                 log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
             }
-            else if (containsForbiddenFragment(firstSentence.get())) {
+            else if (containsForbiddenFragment(firstSentence.orElseThrow())) {
                 log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
             }
         }
@@ -604,7 +604,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             if (node.getChildren().length == 0) {
                 Optional<String> sentenceEnding = findSentenceEnding(node.getText(), period);
                 if (sentenceEnding.isPresent()) {
-                    sentenceParts.add(sentenceEnding.get());
+                    sentenceParts.add(sentenceEnding.orElseThrow());
                     sentence = String.join("", sentenceParts);
                     break;
                 }
