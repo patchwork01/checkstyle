@@ -19,10 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -586,7 +588,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
     }
 
     /**
-     * Finds and returns first sentence.
+     * Finds and returns the first sentence.
      *
      * @param ast Javadoc root node.
      * @param period The configured period symbol.
@@ -595,40 +597,41 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
     private static String getFirstSentence(DetailNode ast, String period) {
         final Deque<DetailNode> nodesToProcess = new LinkedList<>();
         nodesToProcess.push(ast);
-        final StringBuilder result = new StringBuilder(256);
-        boolean foundPeriod = false;
+        final List<String> sentenceParts = new ArrayList<>();
+        String sentence = "";
         while (!nodesToProcess.isEmpty()) {
             final DetailNode node = nodesToProcess.pop();
-            if (node.getChildren().length == 0
-                && appendUpToSentenceEndingPeriod(node.getText(), period, result)) {
-                foundPeriod = true;
-                break;
+            if (node.getChildren().length == 0) {
+                Optional<String> sentenceEnding = findSentenceEnding(node.getText(), period);
+                if (sentenceEnding.isPresent()) {
+                    sentenceParts.add(sentenceEnding.get());
+                    sentence = String.join("", sentenceParts);
+                    break;
+                }
+                else {
+                    sentenceParts.add(node.getText());
+                }
             }
             // Pushing last child first means it will be processed last
             for (int childIndex = node.getChildren().length - 1; childIndex >= 0; childIndex--) {
                 nodesToProcess.push(node.getChildren()[childIndex]);
             }
         }
-        if (!foundPeriod) {
-            result.setLength(0);
-        }
-        return result.toString();
+        return sentence;
     }
 
     /**
-     * Find the end of a sentence, and append the sentence to the result if it ends with a period.
-     * If no period is present, append the whole string to the result. The end of sentence detection
-     * here could be replaced in the future by Java's built-in BreakIterator class.
+     * Finds the end of a sentence. If a sentence ending period was found, returns the whole string
+     * up to and excluding that period. The end of sentence detection here could be replaced in the
+     * future by Java's built-in BreakIterator class.
      *
      * @param text string to append to result
      * @param period period character to find
-     * @param result builder to append to
-     * @return true if a sentence ending period was found, false otherwise
+     * @return the string up to and excluding the period, if one was found
      */
-    private static boolean appendUpToSentenceEndingPeriod(
-            String text, String period, StringBuilder result) {
+    private static Optional<String> findSentenceEnding(String text, String period) {
         int periodIndex = text.indexOf(period);
-        boolean foundPeriod = false;
+        String sentenceEnding = null;
         while (periodIndex >= 0) {
             final int afterPeriodIndex = periodIndex + period.length();
 
@@ -637,17 +640,13 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             if (!DEFAULT_PERIOD.equals(period)
                 || afterPeriodIndex >= text.length()
                 || Character.isWhitespace(text.charAt(afterPeriodIndex))) {
-                result.append(text, 0, periodIndex);
-                foundPeriod = true;
+                    sentenceEnding = text.substring(0, periodIndex);
                 break;
             }
             else {
                 periodIndex = text.indexOf(period, afterPeriodIndex);
             }
         }
-        if (!foundPeriod) {
-            result.append(text);
-        }
-        return foundPeriod;
+        return Optional.ofNullable(sentenceEnding);
     }
 }
