@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
@@ -232,11 +233,11 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC_MISSING);
         }
         else if (!period.isEmpty()) {
-            final Optional<String> firstSentence = getFirstSentence(ast, period);
-            if (!summaryDoc.contains(period) || firstSentence.isEmpty()) {
+            final String firstSentence = getFirstSentence(ast, period).orElse(null);
+            if (!summaryDoc.contains(period) || firstSentence == null) {
                 log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
             }
-            else if (containsForbiddenFragment(firstSentence.orElseThrow())) {
+            else if (containsForbiddenFragment(firstSentence)) {
                 log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
             }
         }
@@ -590,7 +591,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
     /**
      * Finds and returns the first sentence.
      *
-     * @param ast Javadoc root node.
+     * @param ast The Javadoc root node.
      * @param period The configured period symbol.
      * @return The first sentence up to and excluding the period, if a sentence ending was found.
      */
@@ -599,25 +600,32 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
         nodesToProcess.push(ast);
         final List<String> sentenceParts = new ArrayList<>();
         String sentence = null;
-        while (!nodesToProcess.isEmpty()) {
-            final DetailNode node = nodesToProcess.pop();
-            if (node.getChildren().length == 0) {
-                Optional<String> sentenceEnding = findSentenceEnding(node.getText(), period);
-                if (sentenceEnding.isPresent()) {
-                    sentenceParts.add(sentenceEnding.orElseThrow());
-                    sentence = String.join("", sentenceParts);
-                    break;
-                }
-                else {
-                    sentenceParts.add(node.getText());
-                }
-            }
-            // Pushing last child first means it will be processed last
-            for (int childIndex = node.getChildren().length - 1; childIndex >= 0; childIndex--) {
-                nodesToProcess.push(node.getChildren()[childIndex]);
+        for(String text : (Iterable<String>) () -> streamTextParts(ast).iterator()) {
+            String sentenceEnding = findSentenceEnding(text, period).orElse(null);
+            if(sentenceEnding != null) {
+                sentenceParts.add(sentenceEnding);
+                sentence = String.join("", sentenceParts);
+                break;
+            } else {
+                sentenceParts.add(text);
             }
         }
         return Optional.ofNullable(sentence);
+    }
+
+    /**
+     * Streams through all the text under the given node.
+     *
+     * @param node The Javadoc node to examine.
+     * @return All the text in all nodes that have no child nodes.
+     */
+    private static Stream<String> streamTextParts(DetailNode node) {
+        if(node.getChildren().length == 0) {
+            return Stream.of(node.getText());
+        } else {
+            return Stream.of(node.getChildren())
+                .flatMap(child -> streamTextParts(child));
+        }
     }
 
     /**
