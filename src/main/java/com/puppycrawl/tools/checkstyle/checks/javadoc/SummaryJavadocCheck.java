@@ -593,12 +593,12 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @return first sentence.
      */
     private static String getFirstSentence(DetailNode ast, String period) {
-        final Deque<DetailNode> stack = new LinkedList<>();
-        stack.push(ast);
+        final Deque<DetailNode> nodesToProcess = new LinkedList<>();
+        nodesToProcess.push(ast);
         final StringBuilder result = new StringBuilder(256);
         boolean foundPeriod = false;
-        while (!stack.isEmpty()) {
-            final DetailNode node = stack.pop();
+        while (!nodesToProcess.isEmpty()) {
+            final DetailNode node = nodesToProcess.pop();
             if (node.getChildren().length == 0
                 && appendUpToSentenceEndingPeriod(node.getText(), period, result)) {
                 foundPeriod = true;
@@ -606,7 +606,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
             }
             // Pushing last child first means it will be processed last
             for (int childIndex = node.getChildren().length - 1; childIndex >= 0; childIndex--) {
-                stack.push(node.getChildren()[childIndex]);
+                nodesToProcess.push(node.getChildren()[childIndex]);
             }
         }
         if (!foundPeriod) {
