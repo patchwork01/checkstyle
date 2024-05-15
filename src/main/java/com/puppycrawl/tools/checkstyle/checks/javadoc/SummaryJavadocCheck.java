@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
@@ -600,7 +600,8 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @param period The configured period symbol.
      * @return The first sentence up to and excluding the period, or null if no ending was found.
      */
-    private static @Nullable String getFirstSentenceOrNull(DetailNode ast, String period) {
+    @Nullable
+    private static String getFirstSentenceOrNull(DetailNode ast, String period) {
         final List<String> sentenceParts = new ArrayList<>();
         String sentence = null;
         for (String text : (Iterable<String>) streamTextParts(ast)::iterator) {
@@ -644,7 +645,8 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @param period The period character to find.
      * @return The string up to and excluding the period, or null if no ending was found.
      */
-    private static @Nullable String findSentenceEndingOrNull(String text, String period) {
+    @Nullable
+    private static String findSentenceEndingOrNull(String text, String period) {
         int periodIndex = text.indexOf(period);
         String sentenceEnding = null;
         while (periodIndex >= 0) {
