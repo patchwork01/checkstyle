@@ -232,13 +232,13 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
         }
         else if (!period.isEmpty()) {
             if (summaryDoc.contains(period)) {
-                final String firstSentence = getFirstSentence(ast, period).orElse(null);
-                if (firstSentence == null) {
+                getFirstSentence(ast, period).ifPresentOrElse(firstSentence -> {
+                    if (containsForbiddenFragment(firstSentence)) {
+                        log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
+                    }
+                }, () -> {
                     log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
-                }
-                else if (containsForbiddenFragment(firstSentence)) {
-                    log(ast.getLineNumber(), MSG_SUMMARY_JAVADOC);
-                }
+                });
             }
             else {
                 log(ast.getLineNumber(), MSG_SUMMARY_FIRST_SENTENCE);
